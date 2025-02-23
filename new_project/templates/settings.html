@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - BTC FOMO Dashboard{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="card">
+        <h2>Dashboard Settings</h2>
+        
+        <div class="settings-grid">
+            <div class="settings-section">
+                <h3>Display Preferences</h3>
+                <div class="form-group">
+                    <label class="form-label">Default Chart View</label>
+                    <select class="form-input" data-setting="display.default_chart_view">
+                        <option value="1d">1 Day</option>
+                        <option value="1w">1 Week</option>
+                        <option value="1m">1 Month</option>
+                        <option value="3m">3 Months</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Default Scale</label>
+                    <select class="form-input">
+                        <option value="linear">Linear</option>
+                        <option value="log">Logarithmic</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Theme</label>
+                    <select class="form-input" data-setting="display.theme" id="theme-select">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Notification Settings</h3>
+                <div class="form-group">
+                    <label class="switch-label">
+                        Email Notifications
+                        <label class="switch">
+                            <input type="checkbox" data-setting="notifications.email_enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="switch-label">
+                        Browser Notifications
+                        <label class="switch">
+                            <input type="checkbox" data-setting="notifications.browser_enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notification Frequency</label>
+                    <select class="form-input">
+                        <option value="realtime">Real-time</option>
+                        <option value="hourly">Hourly</option>
+                        <option value="daily">Daily</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Data Preferences</h3>
+                <div class="form-group">
+                    <label class="form-label">Default Moving Average</label>
+                    <select class="form-input">
+                        <option value="0">None</option>
+                        <option value="7">7 Days</option>
+                        <option value="14">14 Days</option>
+                        <option value="30">30 Days</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Auto-refresh Interval</label>
+                    <select class="form-input">
+                        <option value="0">Manual</option>
+                        <option value="30">30 seconds</option>
+                        <option value="60">1 minute</option>
+                        <option value="300">5 minutes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-actions">
+            <button class="btn btn-secondary">Reset to Default</button>
+            <button class="btn btn-primary">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section h3 {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.switch-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media screen and (max-width: 768px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .settings-actions {
+        flex-direction: column;
+    }
+    
+    .settings-actions button {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %} 

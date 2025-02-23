@@ -1,391 +1,226 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>BTC FOMO Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% extends "base.html" %}
+
+{% block title %}Dashboard - BTC FOMO{% endblock %}
+
+{% block extra_head %}
+    <!-- Add any dashboard-specific CSS and scripts -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 10px;
-            background-color: #121212;
-            color: white;
-        }
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 10px;
-        }
-        .chart-container {
-            background-color: #1E1E1E;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            overflow-x: auto;
-        }
-        .flex-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .gauge-container {
-            flex: 1;
-            min-width: 300px;
-        }
-        .info-container {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            align-items: center;
-        }
-        .info {
-            background-color: #2d2d2d;
-            padding: 20px;
-            border-radius: 8px;
-            width: 100%;
-        }
-        .chart-controls {
-            display: flex;
-            gap: 20px;
-            padding: 10px;
-            justify-content: center;
-            margin-top: 10px;
-            background-color: #1E1E1E;
-            border-radius: 5px;
-            flex-wrap: wrap;
-        }
-        .dropdown-container, .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        select {
-            background-color: #2d2d2d;
-            color: white;
-            border: 1px solid #3d3d3d;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 120px;
-        }
-        select:hover {
-            background-color: #3d3d3d;
-        }
-        label {
-            color: #ffffff;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        /* Add logout button styles */
-        .logout-btn {
-            float: right;
-            background-color: #FF6D00;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .logout-btn:hover {
-            background-color: #FF8F00;
-        }
-        h1 {
-            display: inline-block;
-            font-size: 24px;
-            margin: 10px 0;
-        }
+{% endblock %}
 
-        /* Responsive Design */
-        @media screen and (max-width: 768px) {
-            .container {
-                padding: 5px;
-            }
-            
-            .chart-container {
-                padding: 10px;
-            }
-            
-            .flex-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .gauge-container,
-            .info-container {
-                width: 100%;
-                min-width: unset;
-            }
-            
-            .chart-controls {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-            
-            .dropdown-container,
-            .toggle-container {
-                justify-content: space-between;
-            }
-            
-            select {
-                width: 150px;
-            }
-            
-            h1 {
-                font-size: 20px;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            body {
-                padding: 5px;
-            }
-            
-            .container {
-                padding: 2px;
-            }
-            
-            h1 {
-                font-size: 18px;
-            }
-            
-            .logout-btn {
-                padding: 6px 12px;
-                font-size: 14px;
-            }
-            
-            select {
-                width: 120px;
-            }
-        }
-
-        .controls-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .date-range-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #date-range {
-            background-color: #2d2d2d;
-            color: white;
-            border: 1px solid #3d3d3d;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 200px;
-        }
-
-        .export-btn {
-            background-color: #2962FF;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background-color 0.3s;
-        }
-
-        .export-btn:hover {
-            background-color: #1E88E5;
-        }
-
-        /* Flatpickr Dark Theme Customization */
-        .flatpickr-calendar {
-            background: #1E1E1E;
-            border: 1px solid #3d3d3d;
-            color: white;
-        }
-
-        .flatpickr-day {
-            color: white;
-        }
-
-        .flatpickr-day.selected {
-            background: #FF6D00;
-            border-color: #FF6D00;
-        }
-
-        .flatpickr-day:hover {
-            background: #3d3d3d;
-        }
-
-        @media screen and (max-width: 768px) {
-            .controls-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .date-range-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            #date-range {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h1>Bitcoin FOMO Dashboard</h1>
-            <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+{% block content %}
+<div class="dashboard-container">
+    <div class="controls-panel">
+        <div class="control-group">
+            <label for="date-range">Date Range:</label>
+            <input type="text" id="date-range" class="form-control" placeholder="Select date range">
         </div>
-        
-        <div class="controls-container">
-            <div class="date-range-container">
-                <label for="date-range">Date Range:</label>
-                <input type="text" id="date-range" placeholder="Select date range">
-            </div>
-            <div class="export-container">
-                <button id="export-btn" class="export-btn">
-                    <i class="fas fa-download"></i> Export Data
-                </button>
-            </div>
+        <div class="control-group">
+            <label for="moving-average">Moving Average:</label>
+            <select id="moving-average" class="form-control">
+                <option value="0">None</option>
+                <option value="7">7 Days</option>
+                <option value="30">30 Days</option>
+                <option value="50">50 Days</option>
+                <option value="200">200 Days</option>
+            </select>
         </div>
-        
-        <div class="chart-container">
-            <div id="price-fomo-chart"></div>
-            <div class="chart-controls">
-                <div class="dropdown-container">
-                    <label for="moving-average">Moving Average:</label>
-                    <select id="moving-average" onchange="updateMovingAverage()">
-                        <option value="">None</option>
-                        <option value="7">7 Days</option>
-                        <option value="30">30 Days</option>
-                        <option value="50">50 Days</option>
-                        <option value="200">200 Days</option>
-                    </select>
-                </div>
-                <div class="toggle-container">
-                    <label for="scale-toggle">Scale:</label>
-                    <select id="scale-toggle" onchange="updateScale()">
-                        <option value="linear">Linear Scale</option>
-                        <option value="log">Log Scale</option>
-                    </select>
-                </div>
-            </div>
+        <div class="control-group">
+            <label for="scale-type">Scale Type:</label>
+            <select id="scale-type" class="form-control">
+                <option value="linear">Linear</option>
+                <option value="log">Log</option>
+            </select>
         </div>
-        
-        <div class="chart-container flex-container">
-            <div class="gauge-container">
-                <div id="gauge-chart"></div>
-            </div>
-            <div class="info-container">
-                <div class="info">
-                    <h2>Current Metrics</h2>
-                    <p><strong>FOMO Index:</strong> {{ additional_info['FOMO Index'] }}</p>
-                    <p><strong>Last BTC Price:</strong> {{ additional_info['Last BTC Price'] }}</p>
-                </div>
-            </div>
+        <div class="control-group checkbox-group">
+            <label>
+                <input type="checkbox" id="show-indicators"> Show Indicators
+            </label>
+        </div>
+        <div class="control-group">
+            <button id="export-btn" class="btn btn-primary">
+                <i class="fas fa-download"></i> Export Data
+            </button>
+        </div>
+        <div class="last-update">
+            Last updated: <span id="last-update-time"></span>
         </div>
     </div>
 
-    <script>
-        function updateMovingAverage() {
-            updateChart();
+    <div class="charts-grid">
+        <div class="chart-card main-chart">
+            <div id="price-fomo-chart"></div>
+        </div>
+        
+        <div class="chart-card gauge-chart">
+            <div id="gauge-chart"></div>
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <h3>Current FOMO Index</h3>
+            <p class="metric-value">{{ additional_info['FOMO Index'] }}</p>
+        </div>
+        <div class="metric-card">
+            <h3>BTC Price</h3>
+            <p class="metric-value">{{ additional_info['Last BTC Price'] }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
+    
+    try {
+        // Initialize the charts
+        const priceFomoChartData = JSON.parse('{{ price_fomo_chart | tojson | safe }}');
+        const gaugeChartData = JSON.parse('{{ gauge_chart | tojson | safe }}');
+
+        console.log('Price FOMO Chart Data:', priceFomoChartData);
+        console.log('Gauge Chart Data:', gaugeChartData);
+
+        if (document.getElementById('price-fomo-chart')) {
+            Plotly.newPlot('price-fomo-chart', 
+                priceFomoChartData.data, 
+                priceFomoChartData.layout
+            );
         }
 
-        function updateScale() {
-            updateChart();
+        if (document.getElementById('gauge-chart')) {
+            Plotly.newPlot('gauge-chart', 
+                gaugeChartData.data, 
+                gaugeChartData.layout
+            );
         }
+    } catch (error) {
+        console.error('Error initializing charts:', error);
+    }
 
-        function updateChart() {
-            const movingAverage = document.getElementById('moving-average').value;
-            const scale = document.getElementById('scale-toggle').value;
+    // Initialize flatpickr
+    if (document.getElementById('date-range')) {
+        flatpickr("#date-range", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            maxDate: "today"
+        });
+    }
 
-            fetch('/update_chart', {
+    // Add event listeners
+    const controls = {
+        'moving-average': refreshData,
+        'scale-type': refreshData,
+        'show-indicators': refreshData,
+        'date-range': refreshData
+    };
+
+    Object.entries(controls).forEach(([id, handler]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', handler);
+        } else {
+            console.error(`Element with id '${id}' not found`);
+        }
+    });
+
+    async function refreshData() {
+        try {
+            const priceChart = document.getElementById('price-fomo-chart');
+            const gaugeChart = document.getElementById('gauge-chart');
+            const showIndicators = document.getElementById('show-indicators').checked;
+            
+            if (!priceChart || !gaugeChart) {
+                console.error('Chart elements not found');
+                return;
+            }
+
+            // Show/hide RSI container based on indicator toggle
+            if (showIndicators) {
+                priceChart.style.opacity = '0.5';
+                gaugeChart.style.opacity = '0.5';
+            } else {
+                priceChart.style.opacity = '1';
+                gaugeChart.style.opacity = '1';
+            }
+
+            const response = await fetch('/refresh_data', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    moving_average: movingAverage || 0,
-                    scale_type: scale
+                    moving_average: document.getElementById('moving-average').value,
+                    scale_type: document.getElementById('scale-type').value,
+                    show_indicators: showIndicators,
+                    date_range: document.getElementById('date-range').value
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error('Error updating chart:', data.error);
-                    return;
-                }
-                
-                // Update the chart
-                Plotly.newPlot('price-fomo-chart', data.chart.data, data.chart.layout);
-                currentChart = data.chart;
-            })
-            .catch(error => {
-                console.error('Error:', error);
             });
-        }
 
-        // Initial chart render
-        document.addEventListener('DOMContentLoaded', function() {
-            currentChart = JSON.parse('{{ price_fomo_chart | safe }}');
-            Plotly.newPlot('price-fomo-chart', currentChart.data, currentChart.layout);
-            Plotly.newPlot('gauge-chart', JSON.parse('{{ gauge_chart | safe }}'));
+            const data = await response.json();
+            
+            if (data.status === 'error') {
+                console.error('Error refreshing data:', data.message);
+                return;
+            }
 
-            // Initialize Flatpickr
-            const dateRangePicker = flatpickr("#date-range", {
-                mode: "range",
-                dateFormat: "Y-m-d",
-                maxDate: "today",
-                defaultDate: [
-                    new Date().setMonth(new Date().getMonth() - 1),  // 1 month ago
-                    new Date()  // today
-                ],
-                onChange: function(selectedDates) {
-                    if (selectedDates.length === 2) {
-                        updateChart(selectedDates[0], selectedDates[1]);
+            // Update the main chart
+            await Plotly.react('price-fomo-chart', 
+                data.chart.data, 
+                {
+                    ...data.chart.layout,
+                    transition: {
+                        duration: 500,
+                        easing: 'cubic-in-out'
                     }
                 }
-            });
+            );
+            
+            // Update the gauge chart
+            await Plotly.react('gauge-chart', 
+                data.gauge_chart.data, 
+                data.gauge_chart.layout
+            );
 
-            // Export functionality
-            document.getElementById('export-btn').addEventListener('click', function() {
-                exportData();
-            });
-        });
+            // Update metrics
+            const metricValues = document.querySelectorAll('.metric-value');
+            if (metricValues.length >= 2) {
+                metricValues[0].textContent = data.additional_info['FOMO Index'];
+                metricValues[1].textContent = data.additional_info['Last BTC Price'];
+            }
 
-        function exportData() {
-            const movingAverage = document.getElementById('moving-average').value;
-            const dateRange = document.getElementById('date-range').value;
+            // Restore opacity
+            if (showIndicators) {
+                priceChart.style.opacity = '0.5';
+                gaugeChart.style.opacity = '0.5';
+            } else {
+                priceChart.style.opacity = '1';
+                gaugeChart.style.opacity = '1';
+            }
 
-            fetch('/export_data', {
-                method: 'POST',
+        } catch (error) {
+            console.error('Error refreshing data:', error);
+            // Restore opacity on error
+            if (priceChart) priceChart.style.opacity = '1';
+            if (gaugeChart) gaugeChart.style.opacity = '1';
+        }
+    }
+
+    // Export functionality
+    document.getElementById('export-btn').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/export_data', {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    moving_average: movingAverage || 0,
-                    date_range: dateRange
-                })
-            })
-            .then(response => response.blob())
-            .then(blob => {
+                }
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -394,11 +229,20 @@
                 a.click();
                 window.URL.revokeObjectURL(url);
                 a.remove();
-            })
-            .catch(error => {
-                console.error('Error exporting data:', error);
-            });
+            }
+        } catch (error) {
+            console.error('Error exporting data:', error);
         }
-    </script>
-</body>
-</html> 
+    });
+
+    // Update timestamp
+    function updateLastRefreshTime() {
+        const now = new Date();
+        document.getElementById('last-update-time').textContent = now.toLocaleTimeString();
+    }
+
+    // Initial update
+    updateLastRefreshTime();
+});
+</script>
+{% endblock %} 
