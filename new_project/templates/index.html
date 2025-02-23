@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BTC FOMO Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #121212;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .chart-container {
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 30px;
+        }
+        .info {
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #ffffff;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .gauge-container {
+            width: 50%;
+        }
+        .info-container {
+            width: 45%;
+            margin-left: 20px;
+        }
+        .dropdown-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .toggle-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .chart-controls {
+            display: flex;
+            gap: 20px;
+            padding: 10px;
+            justify-content: center;
+            margin-top: 10px;
+            background-color: #1E1E1E;
+            border-radius: 5px;
+        }
+        
+        .dropdown-container, .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        select {
+            background-color: #2d2d2d;
+            color: white;
+            border: 1px solid #3d3d3d;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        select:hover {
+            background-color: #3d3d3d;
+        }
+        
+        label {
+            color: #ffffff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bitcoin FOMO Dashboard</h1>
+        
+        <div class="chart-container">
+            <div id="price-fomo-chart"></div>
+            <!-- Chart Controls -->
+            <div class="chart-controls">
+                <div class="dropdown-container">
+                    <label for="moving-average">Moving Average:</label>
+                    <select id="moving-average" onchange="updateMovingAverage()">
+                        <option value="">None</option>
+                        <option value="7">7 Days</option>
+                        <option value="30">30 Days</option>
+                        <option value="50">50 Days</option>
+                        <option value="200">200 Days</option>
+                    </select>
+                </div>
+                <div class="toggle-container">
+                    <label for="scale-toggle">Scale:</label>
+                    <select id="scale-toggle" onchange="updateScale()">
+                        <option value="linear">Linear Scale</option>
+                        <option value="log">Log Scale</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container flex-container">
+            <div class="gauge-container">
+                <div id="gauge-chart"></div>
+            </div>
+            <div class="info-container">
+                <div class="info">
+                    <h2>Current Metrics</h2>
+                    <p><strong>FOMO Index:</strong> {{ additional_info['FOMO Index'] }}</p>
+                    <p><strong>Last BTC Price:</strong> {{ additional_info['Last BTC Price'] }}</p>
+                    <!-- <p><strong>Social Volume (to the moon):</strong> {{ additional_info['Social Volume (to the moon)'] }}</p>
+                    <p><strong>Social Volume (get in):</strong> {{ additional_info['Social Volume (get in)'] }}</p> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentChart;
+
+        function updateChart() {
+            const movingAverage = document.getElementById('moving-average').value;
+            const scale = document.getElementById('scale-toggle').value;
+
+            fetch('/update_chart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    moving_average: movingAverage || 0,
+                    scale_type: scale
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error updating chart:', data.error);
+                    return;
+                }
+                
+                // Update the chart
+                Plotly.newPlot('price-fomo-chart', data.chart.data, data.chart.layout);
+                currentChart = data.chart;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function updateMovingAverage() {
+            updateChart();
+        }
+
+        function updateScale() {
+            updateChart();
+        }
+
+        // Initial chart render
+        document.addEventListener('DOMContentLoaded', function() {
+            currentChart = JSON.parse('{{ price_fomo_chart | safe }}');
+            Plotly.newPlot('price-fomo-chart', currentChart.data, currentChart.layout);
+            Plotly.newPlot('gauge-chart', JSON.parse('{{ gauge_chart | safe }}'));
+        });
+    </script>
+</body>
+</html>
