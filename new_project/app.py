@@ -22,6 +22,7 @@ app.register_blueprint(auth)
 def prepare_data():
     # Ensure that the necessary calculations are done here
     # This is where you would call your functions to prepare cleaned_data
+    print(cleaned_data.columns)
     pass  # Replace with your data preparation logic
 
 def create_price_fomo_chart(moving_average=None):
@@ -323,7 +324,23 @@ def export_data():
 @app.route('/analytics')
 @login_required
 def analytics():
-    return render_template('analytics.html', active_page='analytics')
+    price_correlation = round(calculate_price_correlation(), 4)  # Round to 4 decimal places
+    total_volume, average_volume = calculate_volume_analytics()
+    total_volume = round(total_volume, 2)  # Round to 2 decimal places
+    average_volume = round(average_volume, 2)  # Round to 2 decimal places
+    avg_fomo_index = round(cleaned_data['FOMO Index'].mean(), 2)  # Round to 2 decimal places
+    price_volatility = round(cleaned_data['BTC / USD'].pct_change().std() * 100, 2)  # Round to 2 decimal places
+    fomo_trends = "Your FOMO trends data here"  # Replace with actual calculation
+    market_trend = determine_market_trend()
+
+    return render_template('analytics.html',  
+                           price_correlation=price_correlation,
+                           total_volume=total_volume,
+                           average_volume=average_volume,
+                           avg_fomo_index=avg_fomo_index,
+                           price_volatility=price_volatility,
+                           fomo_trends=fomo_trends,
+                           market_trend=market_trend)
 
 @app.route('/alerts')
 @login_required
@@ -515,6 +532,28 @@ def refresh_data():
     except Exception as e:
         print(f"Error in refresh_data: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 400
+
+@app.route('/profile')
+@login_required
+def user_profile():
+    return render_template('profile.html')  # Create a profile.html template
+
+def calculate_price_correlation():
+    # Calculate correlation between BTC price and Total Volume
+    correlation = cleaned_data[['BTC / USD', 'Total Volume']].corr().iloc[0, 1]
+    return correlation
+
+def calculate_volume_analytics():
+    total_volume = cleaned_data['Total Volume'].sum()
+    average_volume = cleaned_data['Total Volume'].mean()
+    return total_volume, average_volume
+
+def determine_market_trend():
+    avg_fomo_index = cleaned_data['FOMO Index'].mean()
+    if avg_fomo_index > 50:
+        return "Bullish"
+    else:
+        return "Bearish"
 
 if __name__ == '__main__':
     prepare_data()  # Call the function to prepare data once

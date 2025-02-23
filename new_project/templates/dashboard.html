@@ -39,7 +39,7 @@
             </label>
         </div>
         <div class="control-group">
-            <button id="export-btn" class="btn btn-primary">
+            <button id="export-btn" class="btn btn-primary" onclick="exportData()">
                 <i class="fas fa-download"></i> Export Data
             </button>
         </div>
@@ -210,30 +210,43 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     // Export functionality
-    document.getElementById('export-btn').addEventListener('click', async function() {
-        try {
-            const response = await fetch('/export_data', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
+    function exportData() {
+        const dateRange = document.getElementById('date-range').value;
+        const movingAverage = document.getElementById('moving-average').value;
+        const scaleType = document.getElementById('scale-type').value;
+        const showIndicators = document.getElementById('show-indicators').checked;
 
+        fetch('/export_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                date_range: dateRange,
+                moving_average: movingAverage,
+                scale_type: scaleType,
+                show_indicators: showIndicators
+            })
+        })
+        .then(response => {
             if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'fomo_data.csv';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                a.remove();
+                return response.blob(); // Get the response as a blob
             }
-        } catch (error) {
+            throw new Error('Network response was not ok.');
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'exported_data.csv'; // Set the file name
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        })
+        .catch(error => {
             console.error('Error exporting data:', error);
-        }
-    });
+        });
+    }
 
     // Update timestamp
     function updateLastRefreshTime() {

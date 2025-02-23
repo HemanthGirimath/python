@@ -8,34 +8,39 @@
         <h2>Market Analysis</h2>
         <div class="analytics-grid">
             <div class="metric-card">
-                <h3>FOMO Trends</h3>
-                <div class="chart-container" id="fomo-trends-chart"></div>
-            </div>
-            <div class="metric-card">
                 <h3>Price Correlation</h3>
-                <div class="chart-container" id="correlation-chart"></div>
+                <p class="metric-value orange">{{ price_correlation }}</p>
             </div>
             <div class="metric-card">
-                <h3>Volume Analysis</h3>
-                <div class="chart-container" id="volume-chart"></div>
+                <h3>Total Volume</h3>
+                <p class="metric-value orange">{{ total_volume }}</p>
             </div>
             <div class="metric-card">
-                <h3>Market Statistics</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">Avg FOMO Index</span>
-                        <span class="stat-value">65.4</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Price Volatility</span>
-                        <span class="stat-value">2.8%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Market Trend</span>
-                        <span class="stat-value bullish">Bullish</span>
-                    </div>
-                </div>
+                <h3>Average Volume</h3>
+                <p class="metric-value orange">{{ average_volume }}</p>
             </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Market Statistics</h2>
+        <div class="analytics-grid">
+            <div class="metric-card">
+                <h3>Avg FOMO Index</h3>
+                <p class="metric-value green">{{ avg_fomo_index }}</p>
+            </div>
+            <div class="metric-card">
+                <h3>Price Volatility</h3>
+                <p class="metric-value green">{{ price_volatility }}%</p>
+            </div>
+            <!-- <div class="metric-card">
+                <h3>FOMO Trends</h3>
+                <p class="metric-value green">{{ fomo_trends }}</p>
+            </div>
+            <div class="metric-card">
+                <h3>Market Trend</h3>
+                <p class="metric-value green">{{ market_trend }}</p>
+            </div> -->
         </div>
     </div>
 </div>

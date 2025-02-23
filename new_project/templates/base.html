@@ -40,7 +40,7 @@
             <div class="user-menu">
                 <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="User" class="user-avatar">
                 <div class="user-dropdown">
-                    <a href="#" class="dropdown-item">Profile</a>
+                    <a href="{{ url_for('user_profile') }}" class="dropdown-item">Profile</a>
                     <a href="#" class="dropdown-item">Preferences</a>
                     <div class="dropdown-divider"></div>
                     <a href="{{ url_for('auth.logout') }}" class="dropdown-item">Logout</a>

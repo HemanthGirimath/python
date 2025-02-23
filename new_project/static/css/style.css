@@ -296,10 +296,11 @@ body.light-theme .form-input {
 }
 
 .metric-card {
-    background-color: var(--card-dark);
-    padding: 1.5rem;
+    background-color: #1e1e1e;
     border-radius: 8px;
-    text-align: center;
+    padding: 1rem;
+    margin: 0.5rem;
+    color: white;
 }
 
 .metric-card h3 {
@@ -310,8 +311,16 @@ body.light-theme .form-input {
 
 .metric-value {
     font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Specific styles for different metrics */
+.metric-value.orange {
+    color: orange;
+}
+
+.metric-value.green {
+    color: green;
 }
 
 /* Responsive design */
